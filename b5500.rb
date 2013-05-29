@@ -80,7 +80,7 @@ SQL
 end
 
 
-def calculate_distances
+def calculate_distancess
   
   # set algorithm and clear distances table
   sql = <<SQL
@@ -175,17 +175,17 @@ SQL
   $db.execute(sql) do |row|
     geometry = geo_factory.parse_wkt(row['wkt'])
     properties = { 
-      "city_from_id"          => row[0],
-      "city_from_name"        => row[1],
-      "uf_from"               => row[2],
-      "city_to_id"            => row[3],
-      "city_to_name"          => row[4],
-      "uf_to"                 => row[5],      
-      "connected"             => row[6],
-      "tortuous"              => row[7],
-      "route_distance"        => row[8],
-      "great_circle_distance" => row[9],
-      "distance_ratio"  => row[8].to_f / row[9].to_f * 100
+      "city_a_id"                 => row[0],
+      "city_a_name"               => row[1],
+      "city_a_uf"                 => row[2],
+      "city_b_id"                 => row[3],
+      "city_b_name"               => row[4],
+      "city_b_uf"                 => row[5],      
+      "ab_connected?"             => row[6],
+      "ab_tortuous?"              => row[7],
+      "ab_route_distance"         => row[8],
+      "ab_great_circle_distance"  => row[9],
+      "ab_distance_ratio"         => row[8].to_f / row[9].to_f * 100
     }
     feature = RGeo::GeoJSON::Feature.new(geometry, nil ,properties)
     features << feature
@@ -193,7 +193,7 @@ SQL
   features_collection = RGeo::GeoJSON::FeatureCollection.new(features)
   
   File.open("connections.geojson","w") do |f|
-    f.write(RGeo::GeoJSON.encode(features_collection).to_json)
+    f.write("var connections = " + RGeo::GeoJSON.encode(features_collection).to_json)
   end
 end
 
