@@ -13,7 +13,18 @@ require 'slop'
 require 'json'
 require 'rgeo-geojson'
 
-def no_mais_proximo(lon, lat)
+def nearest_cities(lon, lat, limit)
+  sql = <<SQL
+      select id, st_distance(MakePoint(#{lon}, #{lat}), geometry) as distance
+      from cities
+      where lat != '' and lon != '' and distance > 0
+      order by distance
+      limit 3;
+SQL
+  $db.execute(sql) 
+end
+
+def nearest_network_node(lon, lat)
   
   # puts "  Buscando nó mais próximo a #{lon},#{lat}..."
   
@@ -50,7 +61,7 @@ SQL
 end
 
 
-def atualiza_nos_proximos
+def update_nearest_nodes
 
   $db.execute("SELECT CreateSpatialIndex('roads_nodes', 'geometry');") rescue puts 'Spatial index already defined.';  
 
@@ -61,7 +72,7 @@ def atualiza_nos_proximos
     # puts "Encontrando nó mais próximo para #{cidade['nome']} (#{cidade['uf']}):"
     lon = city["lon"].to_f
     lat = city["lat"].to_f
-    $db.execute("update cities set node_id = ? where id = ?", no_mais_proximo(lon, lat), city['id'])
+    $db.execute("update cities set node_id = ? where id = ?", nearest_network_node(lon, lat), city['id'])
     print '.'
   end
   
@@ -72,7 +83,7 @@ end
 def total_distance(node_a, node_b)
   
   sql = <<SQL
-        select cost/1000 as distance from roads_net where nodefrom = #{node_a} and nodeto = #{node_b} limit 1
+        select round(cost/1000) as distance from roads_net where nodefrom = #{node_a} and nodeto = #{node_b} limit 1
 SQL
 
   row = $db.get_first_row(sql) 
@@ -80,54 +91,111 @@ SQL
 end
 
 
-def calculate_distancess
+def calculate_route_distances
   
-  # set algorithm and clear distances table
+  # Set algorithm
+  $db.execute("update roads_net set Algorithm = 'A*';")
+    
+  # Join tables 'cities' and 'pairs' 
   sql = <<SQL
-    update roads_net set Algorithm = 'A*';
-    drop table if exists distances;
-    create table distances (city_id_from integer, city_id_to integer, route_distance number, direct_distance number, connected boolean, tortuous boolean);
-    select AddGeometryColumn('distances', 'geometry', 4326, 'LINESTRING', 'XY');
+    select 
+      city_a.id       as city_a_id,
+      city_a.node_id  as city_a_node_id, 
+      city_b.id       as city_b_id,
+      city_b.node_id  as city_b_node_id
+    from pairs p 
+    left join cities as city_a on p.a_id = city_a.id 
+    left join cities as city_b on p.b_id = city_b.id ;
 SQL
-  $db.execute_batch(sql)
+  
+  # Calculate distance by driving
+  $db.execute(sql).each do |pair|
+    a_id = pair['city_a_id']
+    b_id = pair['city_b_id']
+    a_node_id = pair['city_a_node_id']
+    b_node_id = pair['city_b_node_id']
+    ab_distance = total_distance(a_node_id,b_node_id)
+    ba_distance = total_distance(b_node_id,a_node_id)
+
+    $db.execute("update pairs set ab_route_dist = #{ab_distance}, ba_route_dist = #{ba_distance} where a_id == #{a_id} and b_id == #{b_id}")
+    print '.'
+  end
+  
+end
+
+def calculate_geo_distance
+  puts 'Calculating geo distances...'
+  
+  # Create geometry column for table 'pairs' if not exists
+  $db.execute("select AddGeometryColumn('pairs', 'geometry', 4326, 'LINESTRING', 'XY');")
+  
+  # Join tables 'cities' and 'pairs' 
+  sql = <<SQL
+    select 
+      city_a.id   as a_id,
+      city_a.lon  as a_lon, 
+      city_a.lat  as a_lat, 
+      city_b.id   as b_id,
+      city_b.lon  as b_lon, 
+      city_b.lat  as b_lat
+    from pairs p 
+    left join cities as city_a on p.a_id = city_a.id 
+    left join cities as city_b on p.b_id = city_b.id ;
+SQL
+
+  # Create and save geometry for each pair
+  $db.execute(sql).each do |pair|
+    print '.'
+    $db.execute("update pairs set geometry = GeomFromText('LINESTRING(#{pair['a_lon']} #{pair['a_lat']}, #{pair['b_lon']} #{pair['b_lat']})',4326) where a_id == #{pair['a_id']} and b_id == #{pair['b_id']}")
+  end
+  
+  
+end
+  
+def distances_from_capitals
   
   # get capitals
-  capitais = $db.execute( "select * from cities where capital = 'true' and lon != '' and lat != ''" ) 
+  capitais = $db.execute( "select * from cities where capital = 'true' and lon != '' and lat != '' order by id" ) 
 
-  # find distances to other capitals 
-  for i in 0..capitais.length-1
-    puts "Calculando rotas a partir de #{capitais[i]['nome']} (#{capitais[i]['uf']})"
-    for j in 0..capitais.length-1
-      if i == j then 
-        next
-      end
-      from_node_id  = capitais[i]['node_id']
-      from_city_id  = capitais[i]['id']
-      from_x        = capitais[i]['lon']
-      from_y        = capitais[i]['lat']
+  # Find distances to other cities. Avoids generate duplicated connections by 
+  # iterating over cities' ids ascending.
+  capitais.each do |capital|
+    puts "Calculando rotas a partir de #{capital['nome']} (#{capital["uf"]})"
+    cidades = $db.execute( "select * from cities where capital = 'false' and lon != '' and lat != '' and uf = ? order by id", capital["uf"]) 
+    
+    cidades.each do |cidade|
+      a_node_id  = capital['node_id']
+      a_city_id  = capital['id']
+      a_x        = capital['lon']
+      a_y        = capital['lat']
+
+      b_node_id  = cidade['node_id']
+      b_city_id  = cidade['id']
+      b_x        = cidade['lon']
+      b_y        = cidade['lat']
       
-      to_node_id       = capitais[j]['node_id']
-      to_city_id  = capitais[j]['id']
-      to_x        = capitais[j]['lon']
-      to_y        = capitais[j]['lat']
-      
-      distance = total_distance(from_node_id, to_node_id)
-      geometry_wkt = "LINESTRING(#{from_x} #{from_y}, #{to_x} #{to_y})"
+      ab_route_distance = total_distance(a_node_id, b_node_id)
+      ba_route_distance = total_distance(b_node_id, a_node_id)
+      geometry_wkt = "LINESTRING(#{a_x} #{a_y}, #{b_x} #{b_y})"
             
-      $db.execute("insert into distances values (?,?,?,'','','',GeomFromText(?))",from_city_id, to_city_id, distance, geometry_wkt)
-      print " #{capitais[j]['nome']}: #{distance} km "
+      $db.execute("insert into distances values (?,?,?,?,'','','','','',GeomFromText(?))",a_city_id, b_city_id, ba_route_distance, ab_route_distance, geometry_wkt)
+      print " #{cidade['nome']}: ida=#{ab_route_distance} km volta=#{ba_route_distance} km "
+
     end
+    
     puts ""
   end
   
   # find straight distances between cities
-  $db.execute("update distances set direct_distance = GLength(geometry)*100")
-
-  # update sinuosity status
-  $db.execute("update distances set tortuous = case when route_distance / direct_distance > 1.5 then 'yes' else 'no' end;")
+  $db.execute("update distances set direct_distance = round(GLength(geometry)*100)")
 
   # update connection status
-  $db.execute("update distances set connected = case when route_distance > 0 then 'yes' else 'no' end;")
+  $db.execute("update distances set ab_connected = case when ab_route_distance > 0 then 'yes' else 'no' end;")
+  $db.execute("update distances set ba_connected = case when ba_route_distance > 0 then 'yes' else 'no' end;")
+
+  # update sinuosity status
+  $db.execute("update distances set ab_tortuous = case when ab_route_distance / direct_distance > 1.5 then 'yes' else 'no' end;")
+  $db.execute("update distances set ba_tortuous = case when ba_route_distance / direct_distance > 1.5 then 'yes' else 'no' end;")
 
   
 end
@@ -143,56 +211,94 @@ def import_cities_csv
     create table cities as select * from cities_csv;
     alter table cities add column node_id integer;
 
+    select AddGeometryColumn('cities', 'geometry', 4326, 'POINT', 'XY');
+    select CreateSpatialIndex('cities', 'geometry');
+    update cities set geometry = makepoint(cast(lon as real), cast(lat as real), 4326) where lat != '' and lon != '';
 SQL
-  $db.execute_batch( sql )
+  
+  $db.execute_batch(sql)
+  
+
   
   # Find nearest nodes on network for each city
-  atualiza_nos_proximos()
+  update_nearest_nodes()
   
+end
+
+# 
+# This function setup a 'pair' table and generate pairs between every city and its
+# three nearest cities.
+# 
+def setup_pairs
+
+  # Create table 'pairs' 
+  $db.execute("drop table if exists pairs;")  
+  $db.execute("create table pairs (a_id integer, b_id integer, ab_route_dist number, ba_route_dist number,direct_distance number, ab_connected boolean, ba_connected boolean, ab_tortuous boolean, ba_tortuous boolean);")
+    
+  # Generate city pairs to be analised
+  cities = $db.execute('select * from cities where lat != "" and lon != "" ;')
+  cities.each do |city_a| 
+    puts "Cidades próximas a #{city_a['name']}."
+    nearest_cities(city_a['lon'], city_a['lat'], 3).each do |city_b|
+      # only saves pairs with consecutive ids, to avoid duplicates
+      if city_a['id'] < city_b ['id'] then
+        $db.execute("insert into pairs (a_id, b_id) values (?,?)",city_a['id'], city_b['id'])
+      end
+    end
+  end
 end
 
 def generate_distances_geojson
     
   sql = <<SQL
     select 
-      d.city_id_from,
-      c1.nome, 
-      c1.uf,
-      d.city_id_to,
-      c2.nome,
-      c2.uf,
-      connected,
-      tortuous,
-      route_distance,
+      city_a.id   as city_a_id,
+      city_a.nome as city_a_name, 
+      city_a.uf   as city_a_uf,
+      city_b.id   as city_b_id,
+      city_b.nome as city_b_name, 
+      city_b.uf   as city_b_uf,
+      ab_route_distance,
+      ba_route_distance,
       direct_distance,
+      ab_connected,
+      ba_connected,
+      ab_tortuous,
+      ba_tortuous,      
       aswkt(geometry) as wkt 
     from distances  d 
-    left join cities as c1 on d.city_id_from = c1.id 
-    left join cities as c2 on d.city_id_to = c2.id ;
+    left join cities as city_a on d.city_a_id = city_a.id 
+    left join cities as city_b on d.city_b_id = city_b.id ;
 SQL
   geo_factory = RGeo::Geographic.spherical_factory(:srid => 4326)
   features = []
   $db.execute(sql) do |row|
     geometry = geo_factory.parse_wkt(row['wkt'])
     properties = { 
-      "city_a_id"                 => row[0],
-      "city_a_name"               => row[1],
-      "city_a_uf"                 => row[2],
-      "city_b_id"                 => row[3],
-      "city_b_name"               => row[4],
-      "city_b_uf"                 => row[5],      
-      "ab_connected?"             => row[6],
-      "ab_tortuous?"              => row[7],
-      "ab_route_distance"         => row[8],
-      "ab_great_circle_distance"  => row[9],
-      "ab_distance_ratio"         => row[8].to_f / row[9].to_f * 100
+      "city_a_id"         => row[0],
+      "city_a_name"       => row[1],
+      "city_a_uf"         => row[2],
+      "city_b_id"         => row[3],
+      "city_b_name"       => row[4],
+      "city_b_uf"         => row[5],      
+      "ab_route_distance" => row[6],
+      "ba_route_distance" => row[7],
+      "direct_distance"   => row[8],
+      "ab_connected"      => row[9],
+      "ba_connected"      => row[10],
+      "ab_tortuous"       => row[11],
+      "ba_tortuous"       => row[12],            
+      "ab_distance_ratio" => row[6].to_f / row[8].to_f * 100,
+      "ba_distance_ratio" => row[7].to_f / row[8].to_f * 100
     }
     feature = RGeo::GeoJSON::Feature.new(geometry, nil ,properties)
     features << feature
   end
   features_collection = RGeo::GeoJSON::FeatureCollection.new(features)
   
-  File.open("connections.geojson","w") do |f|
+  # puts RGeo::GeoJSON.encode(features_collection).to_json
+  
+  File.open("template/connections.geojson","w") do |f|
     f.write("var connections = " + RGeo::GeoJSON.encode(features_collection).to_json)
   end
 end
@@ -212,6 +318,9 @@ opts = Slop.parse(:help => true) do
 
   on :i, :import_cities, 'Importa cidades do arquivo cidades.csv'
   on :d, :distances, 'Calcula distancias entre cidades'
+  on :g, :geodistances, 'Calcula distancias geométrica entre cidades.'
+  on :j, :geojson, 'Gera GeoJSON.'
+  on :n, :network_nodes, 'Busca nós da rede mais próximos das cidades.'
   
   # on 'p', 'password', 'An optional password', argument: :optional
   # on 'v', 'verbose', 'Enable verbose mode'
@@ -222,11 +331,21 @@ if opts.import_cities? then
 end
 
 if opts.distances? then
-  calculate_distances()
+  calculate_pairs_distances()
+end
+
+if opts.geodistances? then
+  calculate_geo_distance
+end
+
+if opts.geojson? then
+  generate_distances_geojson()
+end
+
+if opts.network_nodes? then
+  update_nearest_nodes()
 end
 
 
-
-generate_distances_geojson()
 
 $db.close

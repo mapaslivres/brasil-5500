@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Leaflet mobile example</title>
+	<title>Conexões Brasileiras</title>
 
+  <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
@@ -10,7 +11,7 @@
 
 	<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
 	<script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-  <script src="connections.geojson"></script>
+  <script charset="utf-8" src="connections.geojson"></script>
 
 	<style>
 		body {
@@ -48,19 +49,54 @@
       // alert(e.message);
 		}
 		
+		function routing_link(coordinates){
+		  a_x = coordinates[0][0];
+		  a_y = coordinates[0][1];
+		  b_x = coordinates[1][0];
+		  b_y = coordinates[1][1];
+		  return '<a target="_blank"  href="http://map.project-osrm.org/?hl=pt&loc='+a_y+','+a_x+'&loc='+b_y+','+b_x+'">OSRM</a>'
+		}
+		
 		
     L.geoJson(connections, {
             style: function(feature) {
-                if (feature.properties.tortuous == 'yes') {
+                if (feature.properties.ab_tortuous == 'yes'
+                    || feature.properties.ba_tortuous == 'yes') {
                   return {color: "orange", weight: 2, opacity: 0.5};
-                } else if (feature.properties.connected == 'yes') {
-                  return {color: "green", weight: 1, opacity: 0.1};
-                } else {
+                } else if (feature.properties.ab_connected == 'no'
+                    || feature.properties.ba_connected == 'no') {
                   return {color: "red", weight: 4, opacity: 0.1};
+                } else {
+                  return {color: "green", weight: 1, opacity: 0.1};                  
                 }
             },
             onEachFeature: function (feature, layer) {
-                layer.bindPopup(feature.properties.city_to_name);
+              p = feature.properties;
+              text = '<h3>Sobre esta conexão:</h3>'
+              text += '<b>Cidade A</b>: ' + p.city_a_name + ' ('+p.city_a_uf+')' +'<br>'
+              text +=  '<b>Cidade B</b>: ' + p.city_b_name + ' ('+p.city_b_uf+')' + '<br>'
+              if (p.ab_connected == 'yes') {
+                text += '<b>A</b> a <b>B</b>: ' + p.ab_route_distance + ' km'
+                if (p.ab_tortuous == 'yes') {
+                  text += ' (caminho tortuoso em '+p.ab_distance_ratio+'%!) <br>'
+                } else {
+                  text += ' <br>'                  
+                }
+              } else {
+                text += '<b>A</b> a <b>B</b>: sem conexão!<br>'
+              }
+              if (p.ba_connected == 'yes') {
+                text += '<b>B</b> a <b>A</b>: ' + p.ba_route_distance + ' km'
+                if (p.ba_tortuous == 'yes') {
+                  text += ' (caminho tortuoso em '+p.ba_distance_ratio+'%!) <br>'
+                } else {
+                  text += ' <br>'
+                }
+              } else {
+                text += '<b>B</b> a <b>A</b>: sem conexão!<br>'
+              }
+              text += 'Ver esta rota: '+routing_link(feature.geometry.coordinates)
+              layer.bindPopup(text);
             }
         }).addTo(map);
 

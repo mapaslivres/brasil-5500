@@ -1,4 +1,4 @@
-id,uf,nome,lat,lon,capital
+id,uf,name,lat,lon,capital
 1100015,RO,Alta Floresta D'Oeste,-11.9282,-61.996,false
 1100023,RO,Ariquemes,-9.9080067,-63.0323361,false
 1100031,RO,Cabixi,-13.494479,-60.552032,false
@@ -630,7 +630,7 @@ id,uf,nome,lat,lon,capital
 2111078,MA,São João do Soter,-5.10821,-43.816257,false
 2111102,MA,São João dos Patos,-6.4934,-43.703623,false
 2111201,MA,São José de Ribamar,-2.5609115,-44.0559509,false
-2111250,MS,Alcinópolis,-18.325546,-53.704223,false
+5000252,MS,Alcinópolis,-18.325546,-53.704223,false
 2111250,MA,São José dos Basílios,-5.054931,-44.580937,false
 2111300,MA,São Luís,-2.52972,-44.30278,true
 2111409,MA,São Luís Gonzaga do Maranhão,-4.385409,-44.665404,false
