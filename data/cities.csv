@@ -11,7 +11,7 @@ id,uf,name,lat,lon,is_capital
 1100106,RO,Guajará-Mirim,-10.788927,-65.329566,false
 1100114,RO,Jaru,-10.431826,-62.478769,false
 1100122,RO,Ji-Paraná,-10.877741,-61.932152,false
-1100130,RO,Machadinho D'Oeste,-11.5329,-61.0263,false
+1100130,RO,Machadinho D'Oeste,,,false
 1100148,RO,Nova Brasilândia D'Oeste,,,false
 1100155,RO,Ouro Preto do Oeste,-10.7223354,-62.2533413,false
 1100189,RO,Pimenta Bueno,-11.6767868,-61.1863902,false
@@ -360,7 +360,7 @@ id,uf,name,lat,lon,is_capital
 1707405,TO,Esperantina,,,false
 1707553,TO,Fátima,,,false
 1707652,TO,Figueirópolis,-12.131175,-49.174771,false
-1707702,TO,Filadélfia,-10.740475,-40.14371,false
+1707702,TO,Filadélfia,,,false
 1708205,TO,Formoso do Araguaia,-11.797573,-49.531571,false
 1708254,TO,Fortaleza do Tabocão,-9.056106,-48.520563,false
 1708304,TO,Goianorte,-8.774126,-48.931291,false
@@ -510,7 +510,7 @@ id,uf,name,lat,lon,is_capital
 2103554,MA,Conceição do Lago-Açu,-3.851417,-44.889531,false
 2103604,MA,Coroatá,-4.134422,-44.124414,false
 2103703,MA,Cururupu,-1.824255,-44.872996,false
-2103752,MA,Davinópolis,-18.1500839,-47.5567951,false
+2103752,MA,Davinópolis,,,false
 2103802,MA,Dom Pedro,-5.035182,-44.440883,false
 2103901,MA,Duque Bacelar,-4.150019,-42.947696,false
 2104008,MA,Esperantinópolis,-4.879378,-44.692649,false
@@ -1125,7 +1125,7 @@ id,uf,name,lat,lon,is_capital
 2404606,RN,Ielmo Marinho,-5.824469,-35.549952,false
 2404705,RN,Ipanguaçu,,,false
 2404804,RN,Ipueira,-6.8152805,-37.1984637,false
-2404853,RN,Itajá,-19.0673379,-51.5495141,false
+2404853,RN,Itajá,,,false
 2404903,RN,Itaú,-5.8409848,-37.9925302,false
 2405009,RN,Jaçanã,-6.409057,-36.211347,false
 2405108,RN,Jandaíra,,,false
@@ -1419,7 +1419,7 @@ id,uf,name,lat,lon,is_capital
 2513901,PB,São Bento,,,false
 2513927,PB,São Bentinho,-6.885961,-37.724345,false
 2513943,PB,São Domingos do Cariri,-7.620894,-36.429849,false
-2513968,PB,São Domingos,-13.3998769,-46.3217961,false
+2513968,PB,São Domingos,,,false
 2513984,PB,São Francisco,,,false
 2514008,PB,São João do Cariri,-7.381683,-36.534457,false
 2514107,PB,São João do Tigre,-8.077026,-36.85472,false
@@ -1815,7 +1815,7 @@ id,uf,name,lat,lon,is_capital
 2806503,SE,Santa Rosa de Lima,,,false
 2806602,SE,Santo Amaro das Brotas,-10.789761,-37.0577038,false
 2806701,SE,São Cristóvão,,,false
-2806800,SE,São Domingos,-13.3998769,-46.3217961,false
+2806800,SE,São Domingos,,,false
 2806909,SE,São Francisco,,,false
 2807006,SE,São Miguel do Aleixo,-10.3864914,-37.3855486,false
 2807105,SE,Simão Dias,,,false
@@ -2347,7 +2347,7 @@ id,uf,name,lat,lon,is_capital
 3109501,MG,Cabo Verde,-21.4731366,-46.3972199,false
 3109600,MG,Cachoeira da Prata,-19.524723,-44.453056,false
 3109709,MG,Cachoeira de Minas,,,false
-3109808,MG,Cachoeira Dourada,-18.4858929,-49.4766031,false
+3109808,MG,Cachoeira Dourada,,,false
 3109907,MG,Caetanópolis,-19.295277,-44.413333,false
 3110004,MG,Caeté,-19.897777,-43.670278,false
 3110103,MG,Caiana,-20.695555,-41.924723,false
@@ -2532,7 +2532,7 @@ id,uf,name,lat,lon,is_capital
 3125952,MG,Fervedouro,,,false
 3126000,MG,Florestal,-19.888889,-44.4325,false
 3126109,MG,Formiga,-20.464167,-45.426111,false
-3126208,MG,Formoso,-13.6499059,-48.8775481,false
+3126208,MG,Formoso,,,false
 3126307,MG,Fortaleza de Minas,-20.849166,-46.712222,false
 3126406,MG,Fortuna de Minas,-19.560833,-44.446666,false
 3126505,MG,Francisco Badaró,-16.9925,-42.351667,false
@@ -3093,7 +3093,7 @@ id,uf,name,lat,lon,is_capital
 3171907,MG,Virgolândia,-18.476111,-42.306111,false
 3172004,MG,Visconde do Rio Branco,-21.01,-42.840833,false
 3172103,MG,Volta Grande,,,false
-3172202,MG,Wenceslau Braz,-23.874217,-49.803201,false
+3172202,MG,Wenceslau Braz,,,false
 3200102,ES,Afonso Cláudio,-20.1361,-41.1136,false
 3200136,ES,Águia Branca,-19.0035,-40.7474,false
 3200169,ES,Água Doce do Norte,-18.5324,-40.986,false
@@ -3787,7 +3787,7 @@ id,uf,name,lat,lon,is_capital
 3546504,SP,Santa Ernestina,-21.461769,-48.395317,false
 3546603,SP,Santa Fé do Sul,-20.208252,-50.931958,false
 3546702,SP,Santa Gertrudes,,,false
-3546801,SP,Santa Isabel,-15.2958489,-49.425931,false
+3546801,SP,Santa Isabel,,,false
 3546900,SP,Santa Lúcia,,,false
 3547007,SP,Santa Maria da Serra,-22.566088,-48.159288,false
 3547106,SP,Santa Mercedes,-21.349521,-51.756353,false
@@ -3832,7 +3832,7 @@ id,uf,name,lat,lon,is_capital
 3550605,SP,São Roque,,,false
 3550704,SP,São Sebastião,,,false
 3550803,SP,São Sebastião da Grama,-21.704109,-46.820753,false
-3550902,SP,São Simão,-19.0029482,-50.55023,false
+3550902,SP,São Simão,,,false
 3551009,SP,São Vicente,,,false
 3551108,SP,Sarapuí,-23.63974,-47.824863,false
 3551207,SP,Sarutaiá,-23.272103,-49.476259,false
@@ -3999,7 +3999,7 @@ id,uf,name,lat,lon,is_capital
 4106555,PR,Corumbataí do Sul,-24.100956,-52.11766,false
 4106571,PR,Cruzeiro do Iguaçu,-25.619214,-53.128484,false
 4106605,PR,Cruzeiro do Oeste,-23.779943,-53.077442,false
-4106704,PR,Cruzeiro do Sul,-7.6307956,-72.6703869,false
+4106704,PR,Cruzeiro do Sul,,,false
 4106803,PR,Cruz Machado,-26.01664,-51.342965,false
 4106852,PR,Cruzmaltina,-24.013218,-51.456331,false
 4106902,PR,Curitiba,-25.43564965,-49.2541945,true
@@ -4089,7 +4089,7 @@ id,uf,name,lat,lon,is_capital
 4112801,PR,Joaquim Távora,-23.498654,-49.908998,false
 4112900,PR,Jundiaí do Sul,-23.435671,-50.249579,false
 4112959,PR,Juranda,-24.420866,-52.841344,false
-4113007,PR,Jussara,-15.874813,-50.867431,false
+4113007,PR,Jussara,,,false
 4113106,PR,Kaloré,-23.818835,-51.668709,false
 4113205,PR,Lapa,,,false
 4113254,PR,Laranjal,,,false
@@ -4138,7 +4138,7 @@ id,uf,name,lat,lon,is_capital
 4116406,PR,Nossa Senhora das Graças,-22.912926,-51.797764,false
 4116505,PR,Nova Aliança do Ivaí,-23.176271,-52.603244,false
 4116604,PR,Nova América da Colina,-23.330772,-50.716821,false
-4116703,PR,Nova Aurora,-18.0596519,-48.255172,false
+4116703,PR,Nova Aurora,,,false
 4116802,PR,Nova Cantu,-24.672324,-52.566078,false
 4116901,PR,Nova Esperança,,,false
 4116950,PR,Nova Esperança do Sudoeste,-25.90607,-53.26524,false
@@ -4480,7 +4480,7 @@ id,uf,name,lat,lon,is_capital
 4211405,SC,Nova Erechim,-26.898159,-52.906569,false
 4211454,SC,Nova Itaberaba,-26.942805,-52.814076,false
 4211504,SC,Nova Trento,-27.277976,-48.929836,false
-4211603,SC,Nova Veneza,-16.37108,-49.3212331,false
+4211603,SC,Nova Veneza,,,false
 4211652,SC,Novo Horizonte,,,false
 4211702,SC,Orleans,-28.348674,-49.298616,false
 4211751,SC,Otacílio Costa,,,false
@@ -4548,7 +4548,7 @@ id,uf,name,lat,lon,is_capital
 4215901,SC,São Bonifácio,-27.900907,-48.932608,false
 4216008,SC,São Carlos,,,false
 4216057,SC,São Cristovão do Sul,-27.266627,-50.438807,false
-4216107,SC,São Domingos,-13.3998769,-46.3217961,false
+4216107,SC,São Domingos,,,false
 4216206,SC,São Francisco do Sul,-26.2495087,-48.6308087,false
 4216255,SC,São João do Oeste,-27.098353,-53.597657,false
 4216305,SC,São João Batista,,,false
@@ -4727,7 +4727,7 @@ id,uf,name,lat,lon,is_capital
 4306072,RS,Cristal do Sul,-27.454386,-53.2482974,false
 4306106,RS,Cruz Alta,-28.645001,-53.604831,false
 4306130,RS,Cruzaltense,,,false
-4306205,RS,Cruzeiro do Sul,-7.6307956,-72.6703869,false
+4306205,RS,Cruzeiro do Sul,,,false
 4306304,RS,David Canabarro,-28.384907,-51.848205,false
 4306320,RS,Derrubadas,-27.264151,-53.864535,false
 4306353,RS,Dezesseis de Novembro,-28.219036,-55.061709,false
@@ -5147,7 +5147,7 @@ id,uf,name,lat,lon,is_capital
 5005251,MS,Laguna Carapã,-22.544818,-55.15021,false
 5005400,MS,Maracaju,-21.610544,-55.167763,false
 5005608,MS,Miranda,,,false
-5005681,MS,Mundo Novo,-13.7729429,-50.281378,false
+5005681,MS,Mundo Novo,,,false
 5005707,MS,Naviraí,-23.0630257,-54.2004261,false
 5005806,MS,Nioaque,-21.141882,-55.829618,false
 5006002,MS,Nova Alvorada do Sul,-21.4590433,-54.3744476,false
@@ -5260,7 +5260,7 @@ id,uf,name,lat,lon,is_capital
 5106281,MT,Novo São Joaquim,-14.905406,-53.019362,false
 5106299,MT,Paranaíta,-9.658348,-56.478623,false
 5106307,MT,Paranatinga,-14.426475,-54.052426,false
-5106315,MT,Novo Santo Antônio,-5.287487,-41.932533,false
+5106315,MT,Novo Santo Antônio,,,false
 5106372,MT,Pedra Preta,,,false
 5106422,MT,Peixoto de Azevedo,-10.226168,-54.979376,false
 5106455,MT,Planalto da Serra,-14.651773,-54.781857,false
@@ -5359,7 +5359,7 @@ id,uf,name,lat,lon,is_capital
 5204003,GO,Cabeceiras,-15.7995459,-46.9264991,false
 5204102,GO,Cachoeira Alta,-18.7618269,-50.9432431,false
 5204201,GO,Cachoeira de Goiás,-16.663516,-50.6460411,false
-5204250,GO,Cachoeira Dourada,-18.4858929,-49.4766031,false
+5204250,GO,Cachoeira Dourada,,,false
 5204300,GO,Caçu,-18.5593819,-51.132798,false
 5204409,GO,Caiapônia,-16.9538779,-51.8090761,false
 5204508,GO,Caldas Novas,-17.7449,-48.6252,false
@@ -5447,7 +5447,7 @@ id,uf,name,lat,lon,is_capital
 5212055,GO,Jesúpolis,-15.9483619,-49.3739421,false
 5212105,GO,Joviânia,-17.8019829,-49.6196871,false
 5212204,GO,Jussara,-15.874813,-50.867431,false
-5212253,GO,Lagoa Santa,-19.1853535,-51.3982431,false
+5212253,GO,Lagoa Santa,,,false
 5212303,GO,Leopoldo de Bulhões,-16.6190479,-48.742755,false
 5212501,GO,Luziânia,-16.2533939,-47.9492267,false
 5212600,GO,Mairipotaba,-17.2975379,-49.4898191,false

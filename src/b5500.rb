@@ -17,19 +17,17 @@ if not DB.tables.include?(:cities) then
     Float :lat
     Boolean :is_capital
   end  
+  DB.run("ALTER TABLE cities ADD COLUMN point geography(POINT, 4326);")
 end
 
 if not DB.tables.include?(:connections) then
   DB.create_table :connections do
     foreign_key :start_city_id, :cities, :null=>false
     foreign_key :end_city_id, :cities, :null=>false
-    Float :geographic_distance    
-    Float :ab_route_distance
-    Float :ba_route_distance
-    Boolean :ab_connected
-    Boolean :ba_connected    
-    Boolean :ab_tortuous
-    Boolean :ba_tortuous
+    Integer :geographic_distance    
+    Integer :route_distance
+    Boolean :is_connected
+    Boolean :is_tortuous
   end
   DB.run("ALTER TABLE connections ADD COLUMN line_geometry geography(LINESTRING, 4326);")
 end
@@ -43,25 +41,24 @@ if City.dataset.empty? then
   City.init_db_from_csv('../data/cities.csv') 
 end
 
-Connection.dataset.delete
-City.limit(1).each do |city_a|
-  city_a.nearest(1).each do |city_b|
-    print '.'
+# Calculate connections
+# Connection.dataset.delete
+if Connection.dataset.empty? then 
+  City.all.each do |city_a|
+    city_a.nearest(5).each do |city_b|
+      # print '.'
+      puts "#{city_a.name} => #{city_b.name}"
+      c = Connection.new({:start_city => city_a, :end_city => city_b})
+      c.save
 
-    c = Connection.new({:start_city => city_a, :end_city => city_b})
-    c.save
-    
-    c = Connection.new({:start_city => city_b, :end_city => city_a})
-    c.save
-    
-    
+      puts "#{city_b.name} => #{city_a.name}"    
+      c = Connection.new({:start_city => city_b, :end_city => city_a})
+      c.save
+    end
   end
 end
 
+# connection = Connection.first
+json = Connection.geojson_feature_collection.to_json
 
-# City.first.nearest(5).each do |city_b|
-#   puts city_b.name
-# end
-# City.all.each do |c|
-#   puts c.make_point
-# end
+File.open('../template/connections.geojson', 'w') {|f| f.write("var connections = "+json) }

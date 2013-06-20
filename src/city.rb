@@ -2,12 +2,20 @@ require 'csv'
 
 class City < Sequel::Model
   
+  plugin :validation_helpers
+
+  def validate
+   super
+   validates_presence [:uf, :name, :lon, :lat]
+   validates_unique([:uf, :name],[:lon, :lat])
+  end
+  
   set_allowed_columns :lon, :lat
 
   def nearest(depth)
     City.unrestrict_primary_key
     result = []
-    DB.fetch("select id from cities order by ST_Distance(ST_SetSRID(ST_Point(#{lon}, #{lat}),4326), ST_SetSRID(ST_Point(lon, lat),4326)) limit #{depth} offset 1") do |row|
+    DB.fetch("select id from cities where id != #{id} order by ST_Distance(ST_SetSRID(ST_Point(#{lon}, #{lat}),4326), ST_SetSRID(ST_Point(lon, lat),4326)) limit #{depth} ") do |row|
       result << City[row[:id]]
     end
     result
@@ -22,9 +30,10 @@ class City < Sequel::Model
   end
   
   def self.init_db_from_csv(filename)
+    Connection.dataset.delete
     City.dataset.delete
-    puts 'Initializing cities from ' + filename
-    unmapped_cities = 0
+    $stdout.puts 'Initializing cities from ' + filename + ':'
+    invalid_cities = 0
     total_cities = 0
     CSV.foreach(filename, :headers => true) do |row|
       c = City.new
@@ -34,16 +43,18 @@ class City < Sequel::Model
       c.lon        = row['lon']
       c.lat        = row['lat']
       c.is_capital = row['is_capital']
-      # c.geom       = "GeomFromText('POINT(1 1)')" #c.make_point
-      if c.lon or c.lat then 
+      if c.valid? then 
+        c.point       = "POINT(#{c.lon} #{c.lat})"
         c.save 
+        $stdout.print '.'
       else
-        unmapped_cities = unmapped_cities + 1
+        invalid_cities = invalid_cities + 1
+        $stdout.print 'E'        
       end
       total_cities = total_cities + 1
     end
-    puts 'Cities lacking coordinates: ' + unmapped_cities.to_s
-    puts 'Cities imported: ' + (total_cities - unmapped_cities).to_s + ' out of ' + total_cities.to_s
+    $stdout.puts "\nCities with invalid data: " + invalid_cities.to_s
+    $stdout.puts "Cities imported: " + (total_cities - invalid_cities).to_s + " out of " + total_cities.to_s
   end
   
 end
