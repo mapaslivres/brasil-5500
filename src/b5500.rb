@@ -61,4 +61,4 @@ end
 # connection = Connection.first
 json = Connection.geojson_feature_collection.to_json
 
-File.open('../template/connections.geojson', 'w') {|f| f.write("var connections = "+json) }
+File.open('../map/connections.geojson', 'w') {|f| f.write("var connections = "+json) }

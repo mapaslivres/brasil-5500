@@ -95,7 +95,7 @@ class Connection < Sequel::Model
   # retrive a geojson with all features in DB
   def self.geojson_feature_collection
     features = []
-    all.each do |connection|
+    limit(3000).each do |connection|
       features << connection.as_geojson_hash
     end    
     
